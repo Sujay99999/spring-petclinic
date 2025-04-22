@@ -1,13 +1,13 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9-eclipse-temurin-17'
+            args '-v $HOME/.m2:/root/.m2'  // Cache Maven dependencies
+        }
+    }
 
     triggers {
         githubPush() // Explicitly tell this pipeline to trigger on GitHub push events
-    }
-
-    tools {
-\        maven 'maven3'
-        jdk 'jdk17' 
     }
 
     stages {
