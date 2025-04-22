@@ -27,7 +27,7 @@ pipeline {
         // }
 
         // stage('ZAP Scan via API') {
-        //     agent any // Switch back to Jenkins controller for this stage
+        //     agent any // Switch back to Jenkins controller for this stagess
         //     steps {
         //         sh '''
         //         # Wait for ZAP to fully start
