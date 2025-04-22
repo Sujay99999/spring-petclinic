@@ -88,7 +88,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'This is a test pipeline'
-                sh 'ls -la'  // List files to verify checkouts
+                sh 'ls -la'  // List files to verify checkoutsasasas
             }
         }
     }
