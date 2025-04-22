@@ -76,7 +76,7 @@ pipeline {
     agent any
     
     triggers {
-        githubPush() // Explicitly tell this pipeline to trigger on GitHub push eventas
+        githubPush() // Explicitly tell this pipeline to trigger on GitHub push event
     }
 
     stages {
