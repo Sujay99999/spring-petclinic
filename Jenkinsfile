@@ -20,11 +20,14 @@ pipeline {
         }
         stage('Test Credentials - github') {
             steps {
-                withCredentials([string(credentialsId: 'github-pat-jenkins', variable: 'GIT_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'github-pat-jenkins', 
+                                                passwordVariable: 'GIT_TOKEN', 
+                                                usernameVariable: 'GIT_USERNAME')]) {
                     sh 'echo "Credential access of git successful"'
                 }
             }
         }
+
 
 
         stage('Build') {
