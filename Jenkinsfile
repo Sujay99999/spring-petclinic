@@ -7,7 +7,7 @@ pipeline {
     }
 
     triggers {
-        githubPush() // Explicitly tell this pipeline to trigger on GitHub push events-check now
+        githubPush() // Explicitly tell this pipeline to trigger on GitHub push events-check now -ss
     }
 
     stages {
