@@ -57,7 +57,7 @@ pipeline {
         stage('ZAP Scan') {
             steps {
                 script {
-                    // Wait for ZAP to be fully started
+                    // Wait for ZAP to be fully started 
                     sh 'sleep 10'
                     
                     def targetUrl = "http://juice-shop:3000"
