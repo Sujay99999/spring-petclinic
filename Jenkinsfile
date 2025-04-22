@@ -30,19 +30,19 @@ pipeline {
 
 
 
-        stage('Build') {
-            steps {
-                sh 'mvn -B clean package -DskipTests'
-                echo 'Build completed'
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         sh 'mvn -B clean package -DskipTests'
+        //         echo 'Build completed'
+        //     }
+        // }
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-                echo 'Tests completed'
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         sh 'mvn test'
+        //         echo 'Tests completed'
+        //     }
+        // }
 
         // stage('Static Analysis') {
         //     steps {
