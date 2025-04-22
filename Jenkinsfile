@@ -11,6 +11,15 @@ pipeline {
     }
 
     stages {
+        stage('Test Credentials') {
+            steps {
+                withCredentials([string(credentialsId: 'github-pat-jenkins', variable: 'GIT_TOKEN')]) {
+                    sh 'echo "Credential access successful"'
+                }
+            }
+        }
+
+
         stage('Build') {
             steps {
                 sh 'mvn -B clean package -DskipTests'
