@@ -13,7 +13,8 @@ pipeline {
     stages {
         stage('Test Credentials - sonar') {
             steps {
-                withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonarqube-token',
+                                        variable: 'SONAR_TOKEN')]) {
                     sh 'echo "Credential access of sonar successful"'
                 }
             }
