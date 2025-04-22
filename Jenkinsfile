@@ -80,6 +80,10 @@
 pipeline {
     agent any
     
+    triggers {
+        githubPush() // Explicitly tell this pipeline to trigger on GitHub push events
+    }
+
     stages {
         stage('Test') {
             steps {
