@@ -59,6 +59,10 @@ pipeline {
                 script {
                     // Wait for ZAP to be fully started 
                     sh 'sleep 10'
+
+                    sh 'ping -c 4 zap'  // Check if host is reachable
+                    sh 'curl -v http://zap:8080/JSON/core/view/version/'  // Test basic ZAP API connectivity
+
                     
                     def targetUrl = "http://juice-shop:3000"
                     
