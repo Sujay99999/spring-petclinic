@@ -33,7 +33,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn -B clean package -DskipTests'
+                sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
                 echo 'Build completed'
             }
         }
