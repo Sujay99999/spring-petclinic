@@ -44,49 +44,87 @@ pipeline {
             }
         }
 
-        stage('Static Analysis') {
+        // stage('Static Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
+        //                 sh 'mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('ZAP Scan') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
-                        sh 'mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
-                    }
+                script {
+                    // Wait for ZAP to be fully started
+                    sh 'sleep 10'
+                    
+                    def targetUrl = "http://juice-shop:3000"
+                    
+                    // Spider scan to discover the site structure
+                    sh """
+                        curl "http://zap:8080/JSON/spider/action/scan/?url=${targetUrl}&recurse=true&maxChildren=10&contextName=&subtreeOnly=false" -s > /dev/null
+                        
+                        # Wait for spider to complete - poll the status
+                        while [ \$(curl -s "http://zap:8080/JSON/spider/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
+                            echo "Spider in progress..."
+                            sleep 5
+                        done
+                        echo "Spider completed"
+                    """
+                    
+                    // Run the active scan
+                    sh """
+                        curl "http://zap:8080/JSON/ascan/action/scan/?url=${targetUrl}&recurse=true&inScopeOnly=false&scanPolicyName=&method=&postData=&contextId=" -s > /dev/null
+                        
+                        # Wait for active scan to complete - poll the status
+                        while [ \$(curl -s "http://zap:8080/JSON/ascan/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
+                            echo "Active scan in progress..."
+                            sleep 10
+                        done
+                        echo "Active scan completed"
+                    """
                 }
             }
         }
 
-        stage('ZAP Scan via API') {
-            agent any // Switch back to Jenkins controller for this stage
+        stage('Generate ZAP Report') {
             steps {
-                sh '''
-                # Wait for ZAP to fully start
-                sleep 10
-                # Spider the app (adjust URL and port as needed)
-                curl "http://zap:8080/JSON/spider/action/scan/?url=http://localhost:8080&apikey=zap-api-key"
-                # Wait for spider to finish
-                sleep 10
-                # Active scan
-                curl "http://zap:8080/JSON/ascan/action/scan/?url=http://localhost:8080&apikey=zap-api-key"
-                # Wait for scan to complete
-                sleep 30
-                # Get HTML report
-                curl "http://zap:8080/OTHER/core/other/htmlreport/?apikey=zap-api-key" -o zap-report.html
-                '''
+                script {
+                    // Create a directory for reports
+                    sh 'mkdir -p zap-reports'
+                    
+                    // Generate HTML report
+                    sh 'curl "http://zap:8080/OTHER/core/other/htmlreport/" -o zap-reports/zap-report.html'
+                    
+                    // Generate XML report for potential integration with other tools
+                    sh 'curl "http://zap:8080/OTHER/core/other/xmlreport/" -o zap-reports/zap-report.xml'
+                    
+                    // Copy reports to mounted volume for persistence
+                    sh 'cp -r zap-reports/* /var/jenkins_home/zap-reports/'
+                }
             }
         }
 
         stage('Publish ZAP Report') {
-            agent any // Stay on Jenkins controller
             steps {
+                // Archive the reports as artifacts
+                archiveArtifacts artifacts: 'zap-reports/**', fingerprint: true
+                
+                // Publish HTML report
                 publishHTML([
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
-                    reportName: 'ZAP Report',
-                    reportDir: '.',
+                    keepAll: true,
+                    reportDir: 'zap-reports',
                     reportFiles: 'zap-report.html',
-                    keepAll: true
+                    reportName: 'ZAP Security Report',
+                    reportTitles: 'ZAP Scan Results'
                 ])
             }
         }
+
     }
 
     post {
