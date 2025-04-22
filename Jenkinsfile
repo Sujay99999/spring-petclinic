@@ -19,15 +19,15 @@ pipeline {
                 }
             }
         }
-        stage('Test Credentials - github') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github-pat-jenkins', 
-                                                passwordVariable: 'GIT_TOKEN', 
-                                                usernameVariable: 'GIT_USERNAME')]) {
-                    sh 'echo "Credential access of git successful"'
-                }
-            }
-        }
+        // stage('Test Credentials - github') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'github-pat-jenkins', 
+        //                                         passwordVariable: 'GIT_TOKEN', 
+        //                                         usernameVariable: 'GIT_USERNAME')]) {
+        //             sh 'echo "Credential access of git successful"'
+        //         }
+        //     }
+        // }
 
 
 
