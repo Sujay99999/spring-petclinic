@@ -5,6 +5,11 @@ pipeline {
         githubPush() // Explicitly tell this pipeline to trigger on GitHub push events
     }
 
+    tools {
+\        maven 'maven3'
+        jdk 'jdk17' 
+    }
+
     stages {
         stage('Build') {
             steps {
