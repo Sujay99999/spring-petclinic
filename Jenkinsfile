@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     // sh 'docker exec -u 0 $(docker ps -q) apt-get update && apt-get install -y iputils-ping'
-                    sh 'ping -c 4 zap || echo "Host unreachable but continuing"'
+                    // sh 'ping -c 4 zap || echo "Host unreachable but continuing"'
                     sh 'curl -v http://zap:8080/JSON/core/view/version/ || echo "ZAP API unreachable"'
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
                     // Wait for ZAP to be fully started 
                     sh 'sleep 10'
 
-                    sh 'ping -c 4 zap'  // Check if host is reachable
+                    // sh 'ping -c 4 zap'  // Check if host is reachable
                     sh 'curl -v http://zap:8080/JSON/core/view/version/'  // Test basic ZAP API connectivity
 
                     
