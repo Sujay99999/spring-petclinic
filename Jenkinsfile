@@ -105,41 +105,41 @@ pipeline {
             }
         }
 
-        // stage('Generate ZAP Report') {
-        //     steps {
-        //         script {
-        //             // Create a directory for reports
-        //             sh 'mkdir -p zap-reports'
+        stage('Generate ZAP Report') {
+            steps {
+                script {
+                    // Create a directory for reports
+                    sh 'mkdir -p zap-reports'
                     
-        //             // Generate HTML report
-        //             sh 'curl "http://zap:8080/OTHER/core/other/htmlreport/" -o zap-reports/zap-report.html'
+                    // Generate HTML report
+                    sh 'curl "http://zap:8080/OTHER/core/other/htmlreport/" -o zap-reports/zap-report.html'
                     
-        //             // Generate XML report for potential integration with other tools
-        //             sh 'curl "http://zap:8080/OTHER/core/other/xmlreport/" -o zap-reports/zap-report.xml'
+                    // Generate XML report for potential integration with other tools
+                    sh 'curl "http://zap:8080/OTHER/core/other/xmlreport/" -o zap-reports/zap-report.xml'
                     
-        //             // Copy reports to mounted volume for persistence
-        //             sh 'cp -r zap-reports/* /var/jenkins_home/zap-reports/'
-        //         }
-        //     }
-        // }
+                    // Copy reports to mounted volume for persistence
+                    sh 'cp -r zap-reports/* /var/jenkins_home/zap-reports/'
+                }
+            }
+        }
 
-        // stage('Publish ZAP Report') {
-        //     steps {
-        //         // Archive the reports as artifacts
-        //         archiveArtifacts artifacts: 'zap-reports/**', fingerprint: true
+        stage('Publish ZAP Report') {
+            steps {
+                // Archive the reports as artifacts
+                archiveArtifacts artifacts: 'zap-reports/**', fingerprint: true
                 
-        //         // Publish HTML report
-        //         publishHTML([
-        //             allowMissing: false,
-        //             alwaysLinkToLastBuild: true,
-        //             keepAll: true,
-        //             reportDir: 'zap-reports',
-        //             reportFiles: 'zap-report.html',
-        //             reportName: 'ZAP Security Report',
-        //             reportTitles: 'ZAP Scan Results'
-        //         ])
-        //     }
-        // }
+                // Publish HTML report
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'zap-reports',
+                    reportFiles: 'zap-report.html',
+                    reportName: 'ZAP Security Report',
+                    reportTitles: 'ZAP Scan Results'
+                ])
+            }
+        }
 
     }
 
