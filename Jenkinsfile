@@ -11,10 +11,17 @@ pipeline {
     }
 
     stages {
-        stage('Test Credentials') {
+        stage('Test Credentials - sonar') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
+                    sh 'echo "Credential access of sonar successful"'
+                }
+            }
+        }
+        stage('Test Credentials - github') {
             steps {
                 withCredentials([string(credentialsId: 'github-pat-jenkins', variable: 'GIT_TOKEN')]) {
-                    sh 'echo "Credential access successful"'
+                    sh 'echo "Credential access of git successful"'
                 }
             }
         }
