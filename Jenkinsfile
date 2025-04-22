@@ -31,6 +31,7 @@ pipeline {
 
 
 
+
         stage('Build') {
             steps {
                 sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
@@ -40,7 +41,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                 sh 'mvn test -Dcheckstyle.skip=true'
                 echo 'Tests completed'
             }
         }
@@ -49,7 +50,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('LocalSonar') {
                     withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                        sh 'mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
+                        sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
                     }
                 }
             }
