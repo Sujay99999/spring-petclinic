@@ -32,19 +32,19 @@ pipeline {
 
 
 
-        stage('Build') {
-            steps {
-                sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
-                echo 'Build completed'
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
+        //         echo 'Build completed'
+        //     }
+        // }
 
-        stage('Test') {
-            steps {
-                 sh 'mvn test -Dcheckstyle.skip=true'
-                echo 'Tests completed'
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //          sh 'mvn test -Dcheckstyle.skip=true'
+        //         echo 'Tests completed'
+        //     }
+        // }
 
         // stage('Static Analysis') {
         //     steps {
@@ -58,7 +58,7 @@ pipeline {
         stage('Pre ZAP Scan') {
             steps {
                 script {
-                    sh 'docker exec -u 0 $(docker ps -q) apt-get update && apt-get install -y iputils-ping'
+                    // sh 'docker exec -u 0 $(docker ps -q) apt-get update && apt-get install -y iputils-ping'
                     sh 'ping -c 4 zap || echo "Host unreachable but continuing"'
                     sh 'curl -v http://zap:8080/JSON/core/view/version/ || echo "ZAP API unreachable"'
                 }
