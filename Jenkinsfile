@@ -48,8 +48,8 @@ pipeline {
 
         stage('Static Analysis') {
             steps {
-                withSonarQubeEnv('LocalSonar') {
-                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                withSonarQubeEnv('LocalSonarEnv') {
+                    withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
                         sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
                     }
                 }
