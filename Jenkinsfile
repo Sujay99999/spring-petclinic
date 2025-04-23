@@ -46,15 +46,15 @@ pipeline {
         //     }
         // }
 
-        // stage('Static Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('LocalSonar') {
-        //             withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-        //                 sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Static Analysis') {
+            steps {
+                withSonarQubeEnv('LocalSonar') {
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
+                    }
+                }
+            }
+        }
         stage('Pre ZAP Scan') {
             steps {
                 script {
