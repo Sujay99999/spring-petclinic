@@ -11,23 +11,23 @@ pipeline {
     }
 
     stages {
-        // stage('Test Credentials - sonar') {
-        //     steps {
-        //         withCredentials([string(credentialsId: 'sonarqube-token',
-        //                                 variable: 'SONAR_TOKEN')]) {
-        //             sh 'echo "Credential access of sonar successful"'
-        //         }
-        //     }
-        // }
-        // stage('Test Credentials - github') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'github-pat-jenkins', 
-        //                                         passwordVariable: 'GIT_TOKEN', 
-        //                                         usernameVariable: 'GIT_USERNAME')]) {
-        //             sh 'echo "Credential access of git successful"'
-        //         }
-        //     }
-        // }
+        stage('Test SonarQube Credential') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
+                    sh 'echo "Credential exists and value length is: ${#SONAR_TOKEN}"'
+                }
+            }
+        }
+
+        stage('Test Credentials - github') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-pat-jenkins', 
+                                                passwordVariable: 'GIT_TOKEN', 
+                                                usernameVariable: 'GIT_USERNAME')]) {
+                    sh 'echo "Credential access of git successful"'
+                }
+            }
+        }
 
 //
 
