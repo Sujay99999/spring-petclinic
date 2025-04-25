@@ -32,19 +32,19 @@ pipeline {
 //
 
 
-        // stage('Build') {
-        //     steps {
-        //         sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
-        //         echo 'Build completed'
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
+                echo 'Build completed'
+            }
+        }
 
-        // stage('Test') {
-        //     steps {
-        //          sh 'mvn test -Dcheckstyle.skip=true'
-        //         echo 'Tests completed'
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                 sh 'mvn test -Dcheckstyle.skip=true'
+                echo 'Tests completed'
+            }
+        }
 
         stage('Static Analysis') {
             steps {
