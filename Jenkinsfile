@@ -50,8 +50,19 @@ pipeline {
         stage('Run the Jar file') {
             // /var/jenkins_home/workspace/spring-petclinic-multibranch_main/target/classes/git.properties
             steps {
-                 sh 'mvn test -Dcheckstyle.skip=true'
-                echo 'Tests completed'
+                script {
+                    // Build a Docker image with your JAR
+                    sh "docker build -t myapp:${BUILD_NUMBER} ."
+                    
+                    // Run the container on the same network as ZAP
+                    sh "docker run -d --name myapp-${BUILD_NUMBER} --network pipeline-server_devops-spring -p 8090:8090 myapp:${BUILD_NUMBER}"
+                    
+                    // Wait for application to start
+                    sh "sleep 30"
+                    
+                    // Set the application URL for ZAP to use
+                    env.APP_URL = "http://myapp-${BUILD_NUMBER}:8090"
+                }
             }
         }
 
