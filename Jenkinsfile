@@ -212,12 +212,12 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs(cleanWhenNotBuilt: false,
-                    deleteDirs: true,
-                    disableDeferredWipeout: true,
-                    notFailBuild: true)
-        }
+        // always {
+        //     cleanWs(cleanWhenNotBuilt: false,
+        //             deleteDirs: true,
+        //             disableDeferredWipeout: true,
+        //             notFailBuild: true)
+        // }
         success {
             echo 'Pipeline completed successfully!'
         }
