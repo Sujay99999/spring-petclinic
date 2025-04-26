@@ -187,6 +187,7 @@ pipeline {
                 sh 'apt-get update && apt-get install -y ansible openssh-client file'
                 sh 'ls -la'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh 'cat "${SSH_KEY}"'
                     // Debug the key
                     sh 'file "${SSH_KEY}" || echo "File command failed"'
                     sh 'wc -l "${SSH_KEY}" || echo "wc command failed"'
