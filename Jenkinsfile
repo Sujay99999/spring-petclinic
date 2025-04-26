@@ -183,7 +183,7 @@ pipeline {
         // }
 
         stage('Run Ansible Playbook') {
-            agent any
+            sh 'apt-get update && apt-get install -y ansible'
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook(
