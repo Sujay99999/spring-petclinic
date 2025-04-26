@@ -87,7 +87,7 @@ pipeline {
                     sh 'curl -v http://zap:8080/JSON/core/view/version/'  // Test basic ZAP API connectivity
 
                     
-                    def targetUrl = "http://juice-shop:3000"
+                    def targetUrl = "http://myapp-${BUILD_NUMBER}:8090"
                     
                     // Spider scan to discover the site structure
                     sh """
