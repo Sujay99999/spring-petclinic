@@ -184,7 +184,8 @@ pipeline {
 
         stage('Run Ansible Playbook') {
             steps {
-                sh 'sudo apt-get update && apt-get install -y ansible'
+                sh 'docker exec -u 0 -it $(docker ps -q) apt-get update'
+                sh 'apt-get install -y ansible'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook(
                         playbook: 'playbook.yml',
