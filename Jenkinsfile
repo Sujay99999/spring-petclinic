@@ -195,12 +195,12 @@ pipeline {
                     
                     // Set correct permissions on SSH key
                     sh 'chmod 600 ${SSH_KEY}'
-                    
+
                     ansiblePlaybook(
                         playbook: './playbook.yaml',
                         inventory: './hosts.ini',
                         installation: 'ansible', // Name from Global Tool Configuration
-                        extras: '--private-key=${SSH_KEY}  -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vvvv'
+                        extras: '--private-key=${SSH_KEY}  -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vv'
                     )
                 }
             }
