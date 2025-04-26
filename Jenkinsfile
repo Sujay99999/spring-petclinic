@@ -50,7 +50,7 @@ pipeline {
         stage('Run Application Locally') {
             steps {
                 script {
-                    // Find the JAR file
+                    // Find the JAR files
                     def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
                     
                     // Kill any previously running instance
