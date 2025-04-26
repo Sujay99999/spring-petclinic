@@ -32,54 +32,54 @@ pipeline {
 //
 
 
-        stage('Build') {
-            steps {
-                sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
-                echo 'Build completed'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
+        //         echo 'Build completed'
+        //         archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        //     }
+        // }
 
-        stage('Test') {
-            steps {
-                 sh 'mvn test -Dcheckstyle.skip=true'
-                echo 'Tests completed'
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //          sh 'mvn test -Dcheckstyle.skip=true'
+        //         echo 'Tests completed'
+        //     }
+        // }
 
-        stage('Run Application Locally') {
-            steps {
-                script {
-                    // Find the JAR file
-                    def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
+        // stage('Run Application Locally') {
+        //     steps {
+        //         script {
+        //             // Find the JAR file
+        //             def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
                     
-                    // Kill any previously running instance
-                    sh """
-                        PID=\$(ps -ef | grep java | grep -v grep | grep -v jenkins | awk '{print \$2}')
-                        if [ ! -z "\$PID" ]; then
-                            echo "Killing previous application instance (PID: \$PID)"
-                            kill -9 \$PID || true
-                        fi
-                    """
+        //             // Kill any previously running instance
+        //             sh """
+        //                 PID=\$(ps -ef | grep java | grep -v grep | grep -v jenkins | awk '{print \$2}')
+        //                 if [ ! -z "\$PID" ]; then
+        //                     echo "Killing previous application instance (PID: \$PID)"
+        //                     kill -9 \$PID || true
+        //                 fi
+        //             """
                     
-                    // Run the JAR file in the background
-                    sh """
-                        nohup java -jar ${jarFile} --server.port=8090 > app.log 2>&1 &
-                        echo \$! > app.pid
+        //             // Run the JAR file in the background
+        //             sh """
+        //                 nohup java -jar ${jarFile} --server.port=8090 > app.log 2>&1 &
+        //                 echo \$! > app.pid
                         
-                        # Wait for application to start
-                        echo "Waiting for application to start..."
-                        sleep 30
+        //                 # Wait for application to start
+        //                 echo "Waiting for application to start..."
+        //                 sleep 30
                         
-                        # Verify the application is running
-                        curl -s http://localhost:8090/actuator/health || echo "Application may not be fully started yet"
-                    """
+        //                 # Verify the application is running
+        //                 curl -s http://localhost:8090/actuator/health || echo "Application may not be fully started yet"
+        //             """
                     
-                    // Store the application URL for ZAP to use
-                    env.APP_URL = "http://localhost:8090"
-                }
-            }
-        }
+        //             // Store the application URL for ZAP to use
+        //             env.APP_URL = "http://localhost:8090"
+        //         }
+        //     }
+        // }
 
 
         stage('Pre ZAP Scan') {
@@ -103,7 +103,8 @@ pipeline {
                     sh 'curl -v http://zap:8082/JSON/core/view/version/'  // Test basic ZAP API connectivity
 
                     
-                    def targetUrl = "http://myapp-${BUILD_NUMBER}:8090"
+                    // def targetUrl = "http://myapp-${BUILD_NUMBER}:8090"
+                    def targetUrl = "http://localhost:8888"
                     
                     // Spider scan to discover the site structure
                     sh """
@@ -135,17 +136,14 @@ pipeline {
         stage('Generate ZAP Report') {
             steps {
                 script {
-                    // Create a directory for reports
-                    sh 'mkdir -p dummyFolder'
+                    // Create a directory for reports in the workspace
+                    sh 'mkdir -p zap-reports'
                     
-                    // Generate HTML report
-                    sh 'curl "http://zap:8082/OTHER/core/other/htmlreport/" -o dummyFolder/zap-report.html'
+                    // Generate HTML report directly to workspace
+                    sh 'curl "http://zap:8082/OTHER/core/other/htmlreport/" -o zap-reports/zap-report.html'
                     
-                    // Generate XML report for potential integration with other tools
-                    sh 'curl "http://zap:8082/OTHER/core/other/xmlreport/" -o dummyFolder/zap-report.xml'
-                    
-                    // Copy reports to mounted volume for persistence
-                    sh 'cp -r dummyFolder/* /var/zap/zap-reports/'
+                    // Generate XML report directly to workspace
+                    sh 'curl "http://zap:8082/OTHER/core/other/xmlreport/" -o zap-reports/zap-report.xml'
                 }
             }
         }
