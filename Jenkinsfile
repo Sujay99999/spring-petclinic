@@ -32,54 +32,54 @@ pipeline {
 //
 
 
-        // stage('Build') {
-        //     steps {
-        //         sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
-        //         echo 'Build completed'
-        //         archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
+                echo 'Build completed'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
 
-        // stage('Test') {
-        //     steps {
-        //          sh 'mvn test -Dcheckstyle.skip=true'
-        //         echo 'Tests completed'
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                 sh 'mvn test -Dcheckstyle.skip=true'
+                echo 'Tests completed'
+            }
+        }
 
-        // stage('Run Application Locally') {
-        //     steps {
-        //         script {
-        //             // Find the JAR file
-        //             def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
+        stage('Run Application Locally') {
+            steps {
+                script {
+                    // Find the JAR file
+                    def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
                     
-        //             // Kill any previously running instance
-        //             sh """
-        //                 PID=\$(ps -ef | grep java | grep -v grep | grep -v jenkins | awk '{print \$2}')
-        //                 if [ ! -z "\$PID" ]; then
-        //                     echo "Killing previous application instance (PID: \$PID)"
-        //                     kill -9 \$PID || true
-        //                 fi
-        //             """
+                    // Kill any previously running instance
+                    sh """
+                        PID=\$(ps -ef | grep java | grep -v grep | grep -v jenkins | awk '{print \$2}')
+                        if [ ! -z "\$PID" ]; then
+                            echo "Killing previous application instance (PID: \$PID)"
+                            kill -9 \$PID || true
+                        fi
+                    """
                     
-        //             // Run the JAR file in the background
-        //             sh """
-        //                 nohup java -jar ${jarFile} --server.port=8090 > app.log 2>&1 &
-        //                 echo \$! > app.pid
+                    // Run the JAR file in the background
+                    sh """
+                        nohup java -jar ${jarFile} --server.port=8090 > app.log 2>&1 &
+                        echo \$! > app.pid
                         
-        //                 # Wait for application to start
-        //                 echo "Waiting for application to start..."
-        //                 sleep 30
+                        # Wait for application to start
+                        echo "Waiting for application to start..."
+                        sleep 30
                         
-        //                 # Verify the application is running
-        //                 curl -s http://localhost:8090/actuator/health || echo "Application may not be fully started yet"
-        //             """
+                        # Verify the application is running
+                        curl -s http://localhost:8090/actuator/health || echo "Application may not be fully started yet"
+                    """
                     
-        //             // Store the application URL for ZAP to use
-        //             env.APP_URL = "http://localhost:8090"
-        //         }
-        //     }
-        // }
+                    // Store the application URL for ZAP to use
+                    env.APP_URL = "http://localhost:8090"
+                }
+            }
+        }
 
 
         stage('Pre ZAP Scan') {
