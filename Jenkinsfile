@@ -192,7 +192,7 @@ pipeline {
                     sh 'file "${SSH_KEY}" || echo "File command failed"'
                     sh 'wc -l "${SSH_KEY}" || echo "wc command failed"'
                     
-                    // Fix potential key format issues
+                    // Fix potential key format issuess
                     sh '''
                         mkdir -p ~/.ssh
                         cat "${SSH_KEY}" | tr -d "\\r" > ~/.ssh/id_rsa
