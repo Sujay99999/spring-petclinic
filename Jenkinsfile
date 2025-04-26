@@ -185,10 +185,16 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    sh 'ansible-playbook -i inventory.ini playbook.yml --private-key=${SSH_KEY}'
+                    ansiblePlaybook(
+                        playbook: 'playbook.yml',
+                        inventory: 'hosts.ini',
+                        installation: 'ansible', // Name from Global Tool Configuration
+                        extras: '--private-key=${SSH_KEY}'
+                    )
                 }
             }
         }
+
 
 
     }
