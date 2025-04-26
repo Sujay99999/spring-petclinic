@@ -1,5 +1,5 @@
 - name: Deploy web app to EC2 instance
-  hosts: "local"
+  hosts: "aws"
   gather_facts: yes
   become: yes
   tasks:
