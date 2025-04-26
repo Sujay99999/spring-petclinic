@@ -200,7 +200,7 @@ pipeline {
                         playbook: './playbook.yaml',
                         inventory: './hosts.ini',
                         installation: 'ansible', // Name from Global Tool Configuration
-                        extras: '--private-key=${SSH_KEY}  -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vv'
+                        extras: '--private-key=${SSH_KEY}  -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vvv'
                     )
                 }
             }
