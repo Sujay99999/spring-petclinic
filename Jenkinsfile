@@ -47,24 +47,40 @@ pipeline {
             }
         }
 
-        stage('Run the Jar file') {
-            // /var/jenkins_home/workspace/spring-petclinic-multibranch_main/target/classes/git.properties
+        stage('Run Application Locally') {
             steps {
                 script {
-                    // Build a Docker image with your JAR
-                    sh "docker build -t myapp:${BUILD_NUMBER} ."
+                    // Find the JAR file
+                    def jarFile = sh(script: 'find target -name "*.jar" | grep -v original | head -1', returnStdout: true).trim()
                     
-                    // Run the container on the same network as ZAP
-                    sh "docker run -d --name myapp-${BUILD_NUMBER} --network pipeline-server_devops-spring -p 8090:8090 myapp:${BUILD_NUMBER}"
+                    // Kill any previously running instance
+                    sh """
+                        PID=\$(ps -ef | grep java | grep -v grep | grep -v jenkins | awk '{print \$2}')
+                        if [ ! -z "\$PID" ]; then
+                            echo "Killing previous application instance (PID: \$PID)"
+                            kill -9 \$PID || true
+                        fi
+                    """
                     
-                    // Wait for application to start
-                    sh "sleep 30"
+                    // Run the JAR file in the background
+                    sh """
+                        nohup java -jar ${jarFile} --server.port=8090 > app.log 2>&1 &
+                        echo \$! > app.pid
+                        
+                        # Wait for application to start
+                        echo "Waiting for application to start..."
+                        sleep 30
+                        
+                        # Verify the application is running
+                        curl -s http://localhost:8090/actuator/health || echo "Application may not be fully started yet"
+                    """
                     
-                    // Set the application URL for ZAP to use
-                    env.APP_URL = "http://myapp-${BUILD_NUMBER}:8090"
+                    // Store the application URL for ZAP to use
+                    env.APP_URL = "http://localhost:8090"
                 }
             }
         }
+
 
         stage('Pre ZAP Scan') {
             steps {
