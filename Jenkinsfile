@@ -187,6 +187,11 @@ pipeline {
                 sh 'apt-get update && apt-get install -y ansible'
                 sh 'ls -la'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    // Check the format of the key file
+                    sh 'file "${SSH_KEY}"'
+                    // Count lines in the key file (should be multiple lines)
+                    sh 'wc -l "${SSH_KEY}"'
+                    
                     // Create .ssh directory if it doesn't exist
                     sh 'mkdir -p ~/.ssh'
                     
