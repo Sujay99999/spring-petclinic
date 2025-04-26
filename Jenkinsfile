@@ -48,6 +48,7 @@ pipeline {
         }
 
         stage('Run the Jar file') {
+            // /var/jenkins_home/workspace/spring-petclinic-multibranch_main/target/classes/git.properties
             steps {
                  sh 'mvn test -Dcheckstyle.skip=true'
                 echo 'Tests completed'
