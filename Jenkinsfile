@@ -188,7 +188,7 @@ pipeline {
                 sh 'ls -la'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook(
-                        playbook: './playbook.yml',
+                        playbook: './playbook.yaml',
                         inventory: './hosts.ini',
                         installation: 'ansible', // Name from Global Tool Configuration
                         extras: '--private-key=${SSH_KEY}'
