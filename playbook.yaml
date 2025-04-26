@@ -34,6 +34,13 @@
         group: ec2-user
         mode: '0755'
 
+    - name: Remove existing JAR file
+      file:
+        path: /opt/springboot/spring-petclinic.jar
+        state: absent
+      register: jar_removed
+
+
     - name: Deploy application files
       copy:
         src: /var/jenkins_home/workspace/pring-petclinic-multibranch_main/target/spring-petclinic-3.4.0-SNAPSHOT.jar
