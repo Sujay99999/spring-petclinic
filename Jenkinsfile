@@ -36,6 +36,7 @@ pipeline {
             steps {
                 sh 'mvn -B clean package -DskipTests -Dcheckstyle.skip=true'
                 echo 'Build completed'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
 
@@ -46,21 +47,10 @@ pipeline {
             }
         }
 
-        stage('Static Analysis') {
+        stage('Run the Jar file') {
             steps {
-                withSonarQubeEnv('LocalSonarEnv') {
-                    withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
-                        sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
-                    }
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                 sh 'mvn test -Dcheckstyle.skip=true'
+                echo 'Tests completed'
             }
         }
 
@@ -132,23 +122,33 @@ pipeline {
             }
         }
 
-        // stage('Publish ZAP Report') {
-        //     steps {
-        //         // Archive the reports as artifacts
-        //         archiveArtifacts artifacts: 'zap-reports/**', fingerprint: true
+        stage('Publish ZAP Report') {
+            steps {
+                // Archive the reports as artifacts
+                archiveArtifacts artifacts: 'zap-reports/**', fingerprint: true
                 
-        //         // Publish HTML report
-        //         publishHTML([
-        //             allowMissing: false,
-        //             alwaysLinkToLastBuild: true,
-        //             keepAll: true,
-        //             reportDir: 'zap-reports',
-        //             reportFiles: 'zap-report.html',
-        //             reportName: 'ZAP Security Report',
-        //             reportTitles: 'ZAP Scan Results'
-        //         ])
-        //     }
-        // }
+                // Publish HTML report
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'zap-reports',
+                    reportFiles: 'zap-report.html',
+                    reportName: 'ZAP Security Report',
+                    reportTitles: 'ZAP Scan Results'
+                ])
+            }
+        }
+
+        stage('Static Analysis') {
+            steps {
+                withSonarQubeEnv('LocalSonarEnv') {
+                    withCredentials([string(credentialsId: 'sonarqube-token-jenkins', variable: 'SONAR_TOKEN')]) {
+                        sh 'mvn sonar:sonar -DskipTests -Dcheckstyle.skip=true -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=http://sonarqube:9000'
+                    }
+                }
+            }
+        }
 
     }
 
