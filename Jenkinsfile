@@ -184,32 +184,17 @@ pipeline {
 
         stage('Run Ansible Playbook') {
             steps {
-                sh 'apt-get update && apt-get install -y ansible'
-                sh 'ls -la'
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    // Check the format of the key file
-                    sh 'file "${SSH_KEY}"'
-                    // Count lines in the key file (should be multiple lines)
-                    sh 'wc -l "${SSH_KEY}"'
-                    
-                    // Create .ssh directory if it doesn't exist
-                    sh 'mkdir -p ~/.ssh'
-                    
-                    // Add host key to known_hosts
-                    sh 'ssh-keyscan -H ec2-3-149-234-178.us-east-2.compute.amazonaws.com >> ~/.ssh/known_hosts'
-                    
-                    // Set correct permissions on SSH key
-                    sh 'chmod 600 ${SSH_KEY}'
-
-                    ansiblePlaybook(
-                        playbook: './playbook.yaml',
-                        inventory: './hosts.ini',
-                        installation: 'ansible', // Name from Global Tool Configuration
-                        extras: '--private-key=${SSH_KEY}  -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vvv'
-                    )
+                sh 'apt-get update && apt-get install -y ansible openssh-client'
+                sshagent(['ec2-ssh-key']) {
+                    sh '''
+                        mkdir -p ~/.ssh
+                        ssh-keyscan -H ec2-3-149-234-178.us-east-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+                        ansible-playbook -i ./hosts.ini ./playbook.yaml -vvv
+                    '''
                 }
             }
         }
+
 
 
 
