@@ -29,7 +29,13 @@ pipeline {
             }
         }
 
-//
+        stage('Test Credentials - aws.pem') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh 'echo "Credential access of git successful"'
+                }
+            }
+        }
 
 
         stage('Build') {
@@ -175,6 +181,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh 'ansible-playbook -i inventory.ini playbook.yml --private-key=${SSH_KEY}'
+                }
+            }
+        }
+
 
     }
 
