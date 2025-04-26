@@ -182,40 +182,47 @@ pipeline {
             }
         }
 
+        // stage('Run Ansible Playbook') {
+        //     steps {
+        //         sh 'apt-get update && apt-get install -y ansible openssh-client file'
+        //         sh 'ls -la'
+        //         withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+        //             // Debug the key
+        //             sh 'file "${SSH_KEY}" || echo "File command failed"'
+        //             sh 'wc -l "${SSH_KEY}" || echo "wc command failed"'
+                    
+        //             // Convert the key with literal \n to proper newlines
+        //             sh '''
+        //                 mkdir -p ~/.ssh
+        //                 echo -e "$(cat ${SSH_KEY})" > ~/.ssh/id_rsa
+        //                 chmod 600 ~/.ssh/id_rsa
+        //                 ssh-keyscan -H ec2-3-149-234-178.us-east-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+                        
+        //                 # Debug the converted key
+        //                 echo "Number of lines in converted key:"
+        //                 wc -l ~/.ssh/id_rsa
+        //                 echo "First few lines of converted key:"
+        //                 head -3 ~/.ssh/id_rsa
+        //             '''
+                    
+        //             // Run the playbook with the fixed key
+        //             ansiblePlaybook(
+        //                 playbook: './playbook.yaml',
+        //                 inventory: './hosts.ini',
+        //                 installation: 'ansible',
+        //                 extras: '--private-key=~/.ssh/id_rsa -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vvv'
+        //             )
+        //         }
+        //     }
+        // }
+
         stage('Run Ansible Playbook') {
             steps {
-                sh 'apt-get update && apt-get install -y ansible openssh-client file'
-                sh 'ls -la'
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    // Debug the key
-                    sh 'file "${SSH_KEY}" || echo "File command failed"'
-                    sh 'wc -l "${SSH_KEY}" || echo "wc command failed"'
-                    
-                    // Convert the key with literal \n to proper newlines
-                    sh '''
-                        mkdir -p ~/.ssh
-                        echo -e "$(cat ${SSH_KEY})" > ~/.ssh/id_rsa
-                        chmod 600 ~/.ssh/id_rsa
-                        ssh-keyscan -H ec2-3-149-234-178.us-east-2.compute.amazonaws.com >> ~/.ssh/known_hosts
-                        
-                        # Debug the converted key
-                        echo "Number of lines in converted key:"
-                        wc -l ~/.ssh/id_rsa
-                        echo "First few lines of converted key:"
-                        head -3 ~/.ssh/id_rsa
-                    '''
-                    
-                    // Run the playbook with the fixed key
-                    ansiblePlaybook(
-                        playbook: './playbook.yaml',
-                        inventory: './hosts.ini',
-                        installation: 'ansible',
-                        extras: '--private-key=~/.ssh/id_rsa -e "ansible_ssh_common_args=\'-o StrictHostKeyChecking=no\'" -vvv'
-                    )
+                sshagent(['ec2-ssh-key']) {
+                    sh 'ansible-playbook -i ./hosts.ini ./playbook.yaml -vvv'
                 }
             }
         }
-
 
 
 
