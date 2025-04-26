@@ -87,7 +87,7 @@ pipeline {
                 script {
                     // sh 'docker exec -u 0 $(docker ps -q) apt-get update && apt-get install -y iputils-ping'
                     // sh 'ping -c 4 zap || echo "Host unreachable but continuing"'
-                    sh 'curl -v http://zap:8080/JSON/core/view/version/ || echo "ZAP API unreachable"'
+                    sh 'curl -v http://zap:8082/JSON/core/view/version/ || echo "ZAP API unreachable"'
                 }
             }
         }
@@ -100,17 +100,17 @@ pipeline {
                     sh 'sleep 10'
 
                     // sh 'ping -c 4 zap'  // Check if host is reachable
-                    sh 'curl -v http://zap:8080/JSON/core/view/version/'  // Test basic ZAP API connectivity
+                    sh 'curl -v http://zap:8082/JSON/core/view/version/'  // Test basic ZAP API connectivity
 
                     
                     def targetUrl = "http://myapp-${BUILD_NUMBER}:8090"
                     
                     // Spider scan to discover the site structure
                     sh """
-                        curl "http://zap:8080/JSON/spider/action/scan/?url=${targetUrl}&recurse=true&maxChildren=10&contextName=&subtreeOnly=false" -s > /dev/null
+                        curl "http://zap:8082/JSON/spider/action/scan/?url=${targetUrl}&recurse=true&maxChildren=10&contextName=&subtreeOnly=false" -s > /dev/null
                         
                         # Wait for spider to complete - poll the status
-                        while [ \$(curl -s "http://zap:8080/JSON/spider/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
+                        while [ \$(curl -s "http://zap:8082/JSON/spider/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
                             echo "Spider in progress..."
                             sleep 5
                         done
@@ -119,10 +119,10 @@ pipeline {
                     
                     // Run the active scan
                     sh """
-                        curl "http://zap:8080/JSON/ascan/action/scan/?url=${targetUrl}&recurse=true&inScopeOnly=false&scanPolicyName=&method=&postData=&contextId=" -s > /dev/null
+                        curl "http://zap:8082/JSON/ascan/action/scan/?url=${targetUrl}&recurse=true&inScopeOnly=false&scanPolicyName=&method=&postData=&contextId=" -s > /dev/null
                         
                         # Wait for active scan to complete - poll the status
-                        while [ \$(curl -s "http://zap:8080/JSON/ascan/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
+                        while [ \$(curl -s "http://zap:8082/JSON/ascan/view/status/" | grep -o '"status":[0-9]*' | cut -d ':' -f 2) -ne 100 ]; do
                             echo "Active scan in progress..."
                             sleep 10
                         done
@@ -139,10 +139,10 @@ pipeline {
                     sh 'mkdir -p dummyFolder'
                     
                     // Generate HTML report
-                    sh 'curl "http://zap:8080/OTHER/core/other/htmlreport/" -o dummyFolder/zap-report.html'
+                    sh 'curl "http://zap:8082/OTHER/core/other/htmlreport/" -o dummyFolder/zap-report.html'
                     
                     // Generate XML report for potential integration with other tools
-                    sh 'curl "http://zap:8080/OTHER/core/other/xmlreport/" -o dummyFolder/zap-report.xml'
+                    sh 'curl "http://zap:8082/OTHER/core/other/xmlreport/" -o dummyFolder/zap-report.xml'
                     
                     // Copy reports to mounted volume for persistence
                     sh 'cp -r dummyFolder/* /var/zap/zap-reports/'
