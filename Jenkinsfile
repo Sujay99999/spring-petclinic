@@ -232,7 +232,7 @@ pipeline {
                         installation: 'ansible',
                         credentialsId: 'ec2-ssh-key',
                         disableHostKeyChecking: true,
-                        extras: '-vvv'
+                        extras: '-vv'
                     )
                 }
             }
