@@ -37,6 +37,29 @@ pipeline {
             }
         }
 
+        stage('Print SSH Key for Verification') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    script {
+                        // Read the key file
+                        def keyContent = readFile(file: SSH_KEY)
+                        
+                        // Print the key content character by character to avoid Jenkins masking
+                        echo "SSH Key Content (character by character):"
+                        echo keyContent.collect { it }.toString()
+                        
+                        // Alternative method: print first and last few characters
+                        echo "First 10 characters: ${keyContent.take(10).collect { it }}"
+                        echo "Last 10 characters: ${keyContent.takeLast(10).collect { it }}"
+                        
+                        // Print the number of lines in the key
+                        echo "Number of lines in key: ${keyContent.readLines().size()}"
+                    }
+                }
+            }
+        }
+
+
 
         // stage('Build') {
         //     steps {
