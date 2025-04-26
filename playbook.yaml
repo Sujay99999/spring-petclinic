@@ -3,11 +3,11 @@
   gather_facts: yes
   become: yes
   tasks:
-    - name: Install Java
-      apt:
-        name: openjdk-17-jdk
+    - name: Install Java on Red Hat-based systems
+      yum:
+        name: java-17-amazon-corretto
         state: present
-      when: ansible_os_family == "Debian"
+      when: ansible_os_family == "RedHat" or ansible_os_family == "Amazon"
 
     - name: Create application directory
       file:
