@@ -195,7 +195,7 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         mkdir -p ~/.ssh
-                        ssh-keyscan -H ec2-3-149-234-178.us-east-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+                        ssh-keyscan -H ec2-18-234-85-119.compute-1.amazonaws.com >> ~/.ssh/known_hosts
                     '''
                     
                     ansiblePlaybook(
